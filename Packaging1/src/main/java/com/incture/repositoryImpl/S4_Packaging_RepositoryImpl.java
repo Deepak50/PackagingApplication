@@ -32,10 +32,11 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 
 	private Date date;
 	private Timestamp timeNow;
+
 	public String test() {
 		return "testing Packaging1";
 	}
-	
+
 	public static Integer idd;
 
 	public S4_Packaging giveS4PackagingDo(S4_PackagingDto s4_PackagingDto) {
@@ -47,7 +48,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		s4_Packaging_CK.setPLANT(s4_PackagingDto.getPlant());
 		s4_Packaging_CK.setSUPPLIER_ID(s4_PackagingDto.getSupplierId());
 		s4_Packaging.setS4_Packaging_CK(s4_Packaging_CK);
-		s4_Packaging.setCREATED_BY(s4_PackagingDto.getCreatedBy());		
+		s4_Packaging.setCREATED_BY(s4_PackagingDto.getCreatedBy());
 		s4_Packaging.setHEIGHT(s4_PackagingDto.getHeight());
 		s4_Packaging.setLENGTH(s4_PackagingDto.getLength());
 		s4_Packaging.setMAX_QTY_PER_KG(s4_PackagingDto.getMaxQtyPerKg());
@@ -103,7 +104,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		change_Log_CK.setPART_NUM(change_LogDto.getPartNum());
 		change_Log_CK.setSUPPLIER_ID(change_LogDto.getSupplierId());
 		change_Log.setChange_Log_CK(change_Log_CK);
-		change_Log.setFLAG(change_LogDto.getFlag()); 
+		change_Log.setFLAG(change_LogDto.getFlag());
 		change_Log.setUPDATED_BY(change_LogDto.getUpdatedBy());
 		return change_Log;
 	}
@@ -120,7 +121,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 			change_LogDto.setPartNum(s4_PackagingDto.getPartNum());
 			change_LogDto.setSupplierId(s4_PackagingDto.getSupplierId());
 			change_LogDto.setUpdatedBy(s4_PackagingDto.getUpdatedBy());
-			change_LogDto.setUpdatedDate(timeNow.toString()); 
+			change_LogDto.setUpdatedDate(timeNow.toString());
 			change_LogDto.setFlag("00");
 			Change_Log change_LogDo = giveChangeLogDo(change_LogDto);
 			change_LogDo.setUPDATED_DATE(ts); // actual time updation
@@ -130,22 +131,22 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		return "Object not found";
 	}
 
-	//@Override
+	// @Override
 	public String insertFromExcel(ExcelDto excelDto) {
 		S4_PackagingDto s4_PackagingDto = new S4_PackagingDto();
 		s4_PackagingDto.setPartNum(excelDto.getPartNo());
 		s4_PackagingDto.setPlant(excelDto.getPlant());
 		s4_PackagingDto.setSupplierId(excelDto.getSupplierId());
-		if(excelDto.getPartDescription() != null)
-		s4_PackagingDto.setPartDesc(excelDto.getPartDescription());
-		if(excelDto.getPartWeight() != null)
-		s4_PackagingDto.setWeight(excelDto.getPartWeight());
-		if(excelDto.getPartlength() != null)
-		s4_PackagingDto.setLength(excelDto.getPartlength());
-		if(excelDto.getPartHeight() != null)
-		s4_PackagingDto.setHeight(excelDto.getPartHeight());
-		if(excelDto.getPartWidth() != null)
-		s4_PackagingDto.setWidth(excelDto.getPartWidth());
+		if (excelDto.getPartDescription() != null)
+			s4_PackagingDto.setPartDesc(excelDto.getPartDescription());
+		if (excelDto.getPartWeight() != null)
+			s4_PackagingDto.setWeight(excelDto.getPartWeight());
+		if (excelDto.getPartlength() != null)
+			s4_PackagingDto.setLength(excelDto.getPartlength());
+		if (excelDto.getPartHeight() != null)
+			s4_PackagingDto.setHeight(excelDto.getPartHeight());
+		if (excelDto.getPartWidth() != null)
+			s4_PackagingDto.setWidth(excelDto.getPartWidth());
 		S4_Packaging s4_Packaging = giveS4PackagingDo(s4_PackagingDto);
 		sessionFactory.getCurrentSession().saveOrUpdate(s4_Packaging);
 		Change_LogDto change_LogDto = new Change_LogDto();
@@ -153,7 +154,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		change_LogDto.setSupplierId(excelDto.getSupplierId());
 		change_LogDto.setFlag("00");
 		Change_Log change_LogDo = giveChangeLogDo(change_LogDto);
-		//change_LogDo.setUPDATED_DATE(ts); // actual time updation
+		// change_LogDo.setUPDATED_DATE(ts); // actual time updation
 		sessionFactory.getCurrentSession().saveOrUpdate(change_LogDo);
 		return "Successful";
 	}
@@ -179,16 +180,16 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		return "Testing auto";
 	}
 
-	public AutoGen giveDo(AutoGenDto autoGenDto){
+	public AutoGen giveDo(AutoGenDto autoGenDto) {
 		AutoGen autoGen = new AutoGen();
-		
-//		if(autoGenDto.getId() != null){
-//			autoGen.setId(autoGenDto.getId());
-//		}
-//		else{
-//			autoGen.setId(null);
-//		}
-		if(autoGenDto.getId() != null)
+
+		// if(autoGenDto.getId() != null){
+		// autoGen.setId(autoGenDto.getId());
+		// }
+		// else{
+		// autoGen.setId(null);
+		// }
+		if (autoGenDto.getId() != null)
 			idd = new Integer(autoGenDto.getId());
 		else
 			idd = null;
@@ -196,24 +197,25 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		System.out.println(autoGen);
 		return autoGen;
 	}
-	
+
+	// Related to AutoGeneration
 	@Override
 	public AutoGenDto save(AutoGenDto dto) {
-		System.out.println("Dto"+dto);
-		if(dto.getId() != null){
+		System.out.println("Dto" + dto);
+		if (dto.getId() != null) {
 			String queryString = "insert into \"USR_EYDCV8U0D03RRFFGCL3N91N7X\".\"AutoGen5\" values(:name,:id)";
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(queryString);
 			query.setParameter("id", dto.getId());
 			query.setParameter("name", dto.getName());
-	//		sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
+			// sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
 			query.executeUpdate();
-		}
-		else{
+		} else {
 			sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
 		}
 		return null;
 	}
 
+	// Related to AutoGeneration
 	@Override
 	public List<AutoGen> getAll() {
 		String queryStr = "from AutoGen";

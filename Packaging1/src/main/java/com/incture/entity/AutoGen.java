@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+//Related to AutoGeneration
 @Entity
 @Table(name = "AutoGen5")
 public class AutoGen {
@@ -21,15 +22,9 @@ public class AutoGen {
 	@Column(name = "ID",unique = true, nullable = false)
 	protected Integer id;
 	
-//	@Id
-//	@Column(name = "ID", nullable = false)
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-//	private Long id;
-
 	@Column
 	private String name;
 	
-
 	public Integer getId() {
 		return id;
 	}

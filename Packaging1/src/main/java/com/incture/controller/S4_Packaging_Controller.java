@@ -84,12 +84,14 @@ public class S4_Packaging_Controller {
 		return ms.pdfConvert();
 	}
 
+	//Related to AutoGeneration
 	@RequestMapping(value = "/saveAutoGen", method = RequestMethod.POST, consumes = "application/json")
 	public AutoGenDto save(@RequestBody AutoGenDto autoGenDto) {
 		System.out.println(autoGenDto);
 		return mr.save(autoGenDto);
 	}
 
+	//Related to AutoGeneration
 	@RequestMapping(value = "/getAllAutoGen", method = RequestMethod.GET)
 	public List<AutoGen> getAll() {
 		return mr.getAll();
