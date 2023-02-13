@@ -280,6 +280,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 	public void sendMailOAuth() {
 		// get access token
 		// the setcode() attribute has to be newly set everytime. Code can be obtained from making an http call in the browser with url: https://login.microsoftonline.com/78d7cfc1-dedd-4464-b309-74a59265897e/oauth2/v2.0/authorize?client_id=99b2143a-be2a-462b-bbe4-f4d1573b5d9a&response_type=code&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&response_mode=query&scope=https://outlook.office365.com/.default
+		
 		OAuthClient client = new OAuthClient(new URLConnectionClient());
 		OAuthClientRequest request = null;
 		try {
