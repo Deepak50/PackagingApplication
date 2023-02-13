@@ -1,16 +1,36 @@
 package com.incture.repositoryImpl;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
-import org.hibernate.SQLQuery;
+import org.apache.oltu.oauth2.client.OAuthClient;
+import org.apache.oltu.oauth2.client.URLConnectionClient;
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest.AuthenticationRequestBuilder;
+import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
+import org.apache.oltu.oauth2.common.OAuth;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Repository;
+
 import com.incture.compositeKey.Change_Log_CK;
 import com.incture.compositeKey.S4_Packaging_CK;
 import com.incture.dto.AutoGenDto;
@@ -22,6 +42,15 @@ import com.incture.entity.Change_Log;
 import com.incture.entity.S4_Packaging;
 import com.incture.entity.Sample;
 import com.incture.repository.S4_Packaging_Repository;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 @Repository
 @Transactional
@@ -182,19 +211,13 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 
 	public AutoGen giveDo(AutoGenDto autoGenDto) {
 		AutoGen autoGen = new AutoGen();
-
-		// if(autoGenDto.getId() != null){
-		// autoGen.setId(autoGenDto.getId());
-		// }
-		// else{
-		// autoGen.setId(null);
-		// }
 		if (autoGenDto.getId() != null)
 			idd = new Integer(autoGenDto.getId());
 		else
 			idd = null;
+		autoGen.setId(autoGenDto.getId());
 		autoGen.setName(autoGenDto.getName());
-		System.out.println(autoGen);
+		System.out.println("The idd is : " + idd);
 		return autoGen;
 	}
 
@@ -202,16 +225,7 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 	@Override
 	public AutoGenDto save(AutoGenDto dto) {
 		System.out.println("Dto" + dto);
-		if (dto.getId() != null) {
-			String queryString = "insert into \"USR_EYDCV8U0D03RRFFGCL3N91N7X\".\"AutoGen5\" values(:name,:id)";
-			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(queryString);
-			query.setParameter("id", dto.getId());
-			query.setParameter("name", dto.getName());
-			// sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
-			query.executeUpdate();
-		} else {
-			sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
-		}
+		sessionFactory.getCurrentSession().saveOrUpdate(giveDo(dto));
 		return null;
 	}
 
@@ -221,5 +235,86 @@ public class S4_Packaging_RepositoryImpl implements S4_Packaging_Repository {
 		String queryStr = "from AutoGen";
 		Query query = sessionFactory.getCurrentSession().createQuery(queryStr);
 		return query.getResultList();
+	}
+
+	// Related to sending emails using basic authentication
+	@Override
+	public void sendMailBasicAuth() {
+		String host = "m.outlook.com";
+		final String user = "kushalappa.ca@incture.com";// change accordingly
+		final String password = "kushal@inc1234";// change accordingly
+
+		String to = "deepakkushalappa123@gmail.com"; // change accordingly
+		Properties props = new Properties();
+		props.put("mail.smtp.starttls.enable", "true"); // this is to enable
+														// secure connection (no
+														// idea how)
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // explicitly set this
+															// to TLSv1.2 (no
+															// idea why)
+		javax.mail.Session session = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(user, password);
+			}
+		});
+
+		try {
+			MimeMessage message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(user));
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+			message.setSubject("Testing Basic Authentication");
+			message.setText("This is a mail sent using Basic Authentication");
+			Transport.send(message);
+			System.out.println("message sent successfully...");
+
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// perfectly working except for token
+	@Override
+	public void sendMailOAuth() {
+		// get access token
+		// the setcode() attribute has to be newly set everytime. Code can be obtained from making an http call in the browser with url: https://login.microsoftonline.com/78d7cfc1-dedd-4464-b309-74a59265897e/oauth2/v2.0/authorize?client_id=99b2143a-be2a-462b-bbe4-f4d1573b5d9a&response_type=code&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&response_mode=query&scope=https://outlook.office365.com/.default
+		OAuthClient client = new OAuthClient(new URLConnectionClient());
+		OAuthClientRequest request = null;
+		try {
+			request = OAuthClientRequest
+					.tokenLocation(
+							"https://login.microsoftonline.com/78d7cfc1-dedd-4464-b309-74a59265897e/oauth2/v2.0/token")
+					.setGrantType(GrantType.AUTHORIZATION_CODE).setClientId("99b2143a-be2a-462b-bbe4-f4d1573b5d9a")
+					.setClientSecret("9PP8Q~0V~iYrlIu_j~5KTnHulAhp_zRzfxKuxaeY")
+					.setScope("https://outlook.office365.com/.default") //the below code has to be newly generated everytime. This can be found at 
+					.setCode(
+							"0.AXIAwc_XeN3eZESzCXSlkmWJfjoUspkqvitGu-T00Vc7XZpyAOc.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wUA9P-JQPvUrho9LfQXlSNkVR375hTPgj6cp9_f9Z4ggKUeLp_4Ez1wB-XgxYranC769YBo6yRnTFsQz1JtdVzsB0hxnnEOZ2sg6Je3sv23s5oqlGDoOh0NThk2G26T841oEHcrPTeV0Q1ZmfLcF0d5KuJsSXqjcLrl9Y_25aRuNMr0HqcE2ioJ06-i6teMmAr4za3MGaOPKTjHw2zliYA8ZLcyO8Mud3BJbpf7s3ZUmmapRp7_lmVCNJ6OrN9YC3CbELkye3vKNd31vNE0-3afhGLUP7TCUgMlkNiaEy0tuNJPnOA9D3cuAqnOXWkkOqq7_n5sMjeKwcIh-EfmKEb7oPHsmnPFhGq4Sx6J7W79l4TcyM8SXmnhrsb86pnCfyn7G8UFFq4hGg_N5J5QSGSKOSoS6i5IXzTfFWDJhmeoQbSETNdbs7Fqd1OkK3ZHg-MiABk__lYFjhc08NtF1kFLvUmmDmIEiSnhvIAhy4-4bSM2nD_6Wz5v_yP0H6q_IsUW_2j6NuQnrdHPi1gljQ-scorVEAAJld3ifWWkRBPoHbJBTbXbF9kJfQAjkVurNIqUeF2UE87KiPZeYMqCm2O15F7L4BtVjxwZyoIHWH_Cgtsw3Ok0K2Q6ADXDT04BNWcm5MvhxjdCAhE3xrAjYlentqK1lNi7-3mUzASbDyYZJttb")
+					.setRedirectURI("https://login.microsoftonline.com/common/oauth2/nativeclient").buildBodyMessage();
+		} catch (OAuthSystemException e) {
+			e.printStackTrace();
+		}
+		String token = "a";
+		try {
+			token = client.accessToken(request, OAuth.HttpMethod.POST, OAuthJSONAccessTokenResponse.class)
+					.getAccessToken();
+		} catch (OAuthSystemException | OAuthProblemException e1) {
+			e1.printStackTrace();
+		}
+
+		System.out.println(token);
+		OkHttpClient okClient = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse("application/json");
+		RequestBody body = RequestBody.create(mediaType,
+				"{\r\n  \"Message\": {\r\n    \"Subject\": \"Its working2?\",\r\n    \"Body\": {\r\n      \"ContentType\": \"Text\",\r\n      \"Content\": \"Its working2.\"\r\n    },\r\n    \"ToRecipients\": [\r\n      {\r\n        \"EmailAddress\": {\r\n          \"Address\": \"kushalappa.ca@incture.com\"\r\n        }\r\n      }\r\n    ],\r\n    \"Attachments\": [\r\n      {\r\n        \"@odata.type\": \"#Microsoft.OutlookServices.FileAttachment\",\r\n        \"Name\": \"menu.txt\",\r\n        \"ContentBytes\": \"bWFjIGFuZCBjaGVlc2UgdG9kYXk=\"\r\n      }\r\n    ]\r\n  },\r\n  \"SaveToSentItems\": \"false\"\r\n}");
+		Request okRequest = new Request.Builder().url("https://outlook.office.com/api/v2.0/me/sendMail")
+				.method("POST", body).addHeader("Authorization", "Bearer " + token)
+				.addHeader("Content-Type", "application/json").build();
+		try {
+			Response response = okClient.newCall(okRequest).execute();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

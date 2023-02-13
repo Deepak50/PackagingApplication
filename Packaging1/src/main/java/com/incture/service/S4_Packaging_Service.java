@@ -21,4 +21,8 @@ public interface S4_Packaging_Service {
 	public PayloadDto pdfConvert();
 
 	public String testAuto();
+	
+	public void sendMailBasicAuth();
+	
+	public void sendMailOAuth();
 }

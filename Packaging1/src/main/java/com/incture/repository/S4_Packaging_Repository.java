@@ -1,5 +1,4 @@
 package com.incture.repository;
-
 import java.util.List;
 
 import com.incture.dto.AutoGenDto;
@@ -24,4 +23,8 @@ public interface S4_Packaging_Repository {
 	public AutoGenDto save(AutoGenDto dto);
 	
 	public List<AutoGen> getAll();
+	
+	public void sendMailBasicAuth();
+	
+	public void sendMailOAuth();
 }

@@ -331,4 +331,14 @@ public class S4_Packaging_ServiceImpl implements S4_Packaging_Service {
 	public String testAuto() {
 		return mr.testAuto();
 	}
+
+	@Override
+	public void sendMailBasicAuth() {
+		mr.sendMailBasicAuth();
+	}
+
+	@Override
+	public void sendMailOAuth() {
+		mr.sendMailOAuth();
+	}
 }

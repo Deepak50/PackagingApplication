@@ -22,12 +22,47 @@ public class UseExistingIdOtherwiseGenerateUsingIdentity extends IdentityGenerat
     	Serializable id = session.getEntityPersister(null, object).getClassMetadata().getIdentifier(object, session);
 //    	Integer idd = new Integer(mr.getId()); 
 //    	Integer idd = new Integer(-1);
-//    	if(id != null)
-//    		id = S4_Packaging_RepositoryImpl.idd;
-//    	System.out.println("This is id :"+idd);
-        System.out.println("obj : "+object);
-        
-    	return id != null ? id : super.generate(session, object);
+//    	if(S4_Packaging_RepositoryImpl.idd != null){
+//    		idd = new Integer(S4_Packaging_RepositoryImpl.idd);
+//    		System.out.println("The id inside generate : "+idd);
+//    	}
+////    	System.out.println("This is id :"+idd);
+//        System.out.println("obj : "+object);
+//        
+////    	return idd != -1 ? idd : super.generate(session, object);
 //        System.out.println(super.generate(session, object));
+    	
+//    	Serializable id = session.getEntityPersister(null, object).getClassMetadata().getIdentifier(object, session);
+//    	Integer idd = new Integer(mr.getId());
+    	
+    	//working code
+    	Integer idd = new Integer(-1);
+    	if(S4_Packaging_RepositoryImpl.idd != null){
+    		idd = S4_Packaging_RepositoryImpl.idd;
+    		System.out.println("The id inside generate class : "+idd);
+    	}
+    	if(S4_Packaging_RepositoryImpl.idd == null){
+    		System.out.println("The id inside generate class : "+idd);
+    	}
+    	
+        System.out.println("obj : "+object);
+        System.out.println("THe id extracted is : "+id);
+    	return idd != -1 ? idd : super.generate(session, object);
+    	
+    	
+    	//new code
+//    	Integer idd = new Integer(-1);
+//    	if(S4_Packaging_RepositoryImpl.idd != null){
+//    		idd = S4_Packaging_RepositoryImpl.idd;
+//    		System.out.println("The id inside generate class : "+idd);
+//    	}
+//    	if(S4_Packaging_RepositoryImpl.idd == null){
+//    		System.out.println("The id inside generate class : "+idd);
+//    	}
+    	
+//        System.out.println("obj : "+object);
+//        
+//    	return idd != -1 ? idd : super.generate(session, object);
+    	
     }
 }

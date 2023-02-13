@@ -2,7 +2,6 @@ package com.incture.repository;
 
 import java.util.List;
 
-import com.incture.dto.Base64Dto;
 import com.incture.dto.Change_LogDto;
 import com.incture.dto.FilterDto;
 import com.incture.dto.Packaging_tableDto;

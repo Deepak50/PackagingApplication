@@ -1,7 +1,13 @@
 package com.incture.controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.incture.compositeKey.Sample_CK;
 import com.incture.dto.AutoGenDto;
-import com.incture.dto.Packaging_tableDto;
 import com.incture.dto.PayloadDto;
 import com.incture.dto.ResponseDto;
 import com.incture.dto.S4_PackagingDto;
@@ -95,5 +100,50 @@ public class S4_Packaging_Controller {
 	@RequestMapping(value = "/getAllAutoGen", method = RequestMethod.GET)
 	public List<AutoGen> getAll() {
 		return mr.getAll();
+	}
+	
+	//Related to mailing
+	@RequestMapping(value = "/sendMailBasicAuth", method = RequestMethod.GET)
+	public void sendMailBasicAuth(){
+		ms.sendMailBasicAuth();
+	}
+	
+	@RequestMapping(value = "/sendMailOAuth", method = RequestMethod.GET)
+	public void sendMailOauth(){
+		ms.sendMailOAuth();
+	}
+	
+	@RequestMapping(value="/redirect", method = RequestMethod.GET)
+	public void redirect(){
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+
+	      //Creating a HttpGet object
+	      HttpGet httpget = new HttpGet("https://www.tutorialspoint.com/");
+
+	      //Printing the method used
+	      System.out.println("Request Type: "+httpget.getMethod());
+
+	      //Executing the Get request
+	      HttpResponse httpresponse = null;
+		try {
+			httpresponse = httpclient.execute(httpget);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	      Scanner sc = null;
+		try {
+			sc = new Scanner(httpresponse.getEntity().getContent());
+		} catch (UnsupportedOperationException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	      //Printing the status line
+	      System.out.println(httpresponse.getStatusLine());
+	      while(sc.hasNext()) {
+	         System.out.println(sc.nextLine());
+	      }
 	}
 }
